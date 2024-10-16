@@ -58,15 +58,13 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-   * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-   * passing it to a
-   * {@link JoystickButton}.
+   * subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then 
+   * passing it to a {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    // While pressing Xbox controller's right bumper (kR1), set the wheels in an X formation to prevent movement
     new JoystickButton(m_driverController, Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
