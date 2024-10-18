@@ -23,7 +23,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private final AHRS gyro = new AHRS(SPI.Port.kOnboardCS0);
+  private final AHRS gyro = new AHRS(SPI.Port.kMXP);
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
