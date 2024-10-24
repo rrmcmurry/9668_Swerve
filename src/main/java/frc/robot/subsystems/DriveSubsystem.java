@@ -69,6 +69,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
+      
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
   
@@ -240,7 +241,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    SmartDashboard.putNumber(getName(), m_gyro.getAngle());
     return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
   }
 
