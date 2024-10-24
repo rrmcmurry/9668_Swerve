@@ -36,6 +36,9 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
+  private boolean m_fieldRelativeDrive = true;
+  private boolean m_rateLimit = false;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -52,7 +55,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true, false),
+                m_fieldRelativeDrive, m_rateLimit),
             m_robotDrive)
       );
   }
@@ -75,6 +78,20 @@ public class RobotContainer {
         .onTrue(new RunCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
+
+    // Pressing Xbox contoller's X button toggles fieldRelativeDrive and zeros the gyroscope's heading
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
+        .onTrue(new RunCommand( 
+            () -> {
+              m_fieldRelativeDrive =!m_fieldRelativeDrive;
+              if (m_fieldRelativeDrive) {m_robotDrive.zeroHeading();}
+            }, m_robotDrive));
+
+    // Pressing Xbox contoller's start button toggles the use of rateLimit
+    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+        .onTrue(new RunCommand( 
+            () -> m_rateLimit =!m_rateLimit));
+
 }
 
   /**
