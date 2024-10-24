@@ -14,7 +14,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -65,9 +64,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // While pressing Xbox controller's right bumper (kR1), set the wheels in an X formation to prevent movement
-    new JoystickButton(m_driverController, Button.kR1.value)
+    new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
+            m_robotDrive));
+
+    // Pressing Xbox contoller's Y button resets the gyroscope's heading
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .onTrue(new RunCommand(
+            () -> m_robotDrive.resetHeading(),
             m_robotDrive));
 }
 

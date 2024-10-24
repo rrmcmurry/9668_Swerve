@@ -46,6 +46,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Create AHRS 
   private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+  private double m_headingOffset = 0.00;
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -113,6 +114,11 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
+
+  public void resetHeading() {
+    m_headingOffset = m_gyro.getRotation2d().getRadians();
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -128,7 +134,10 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
+    double adjustedGyroAngle = m_gyro.getRotation2d().getRadians() - m_headingOffset;
+
     SmartDashboard.putNumber("Gyro: ", m_gyro.getAngle());
+    SmartDashboard.putNumber("Adjusted Gyro: ", adjustedGyroAngle);
 
     if (rateLimit) {
       // Convert XY to polar for rate limiting
@@ -185,7 +194,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromRadians(adjustedGyroAngle))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
