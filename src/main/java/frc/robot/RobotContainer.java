@@ -36,8 +36,11 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
+  // Initially using field relative 
   private boolean m_fieldRelativeDrive = true;
-  private boolean m_rateLimit = false;
+
+  // Initially using rate limits
+  private boolean m_rateLimit = true;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
