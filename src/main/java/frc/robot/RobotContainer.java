@@ -53,7 +53,8 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, false),
-            m_robotDrive));
+            m_robotDrive)
+      );
   }
 
   /**
@@ -72,7 +73,7 @@ public class RobotContainer {
     // Pressing Xbox contoller's Y button resets the gyroscope's heading
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .onTrue(new RunCommand(
-            () -> m_robotDrive.resetHeading(),
+            () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
 }
 
