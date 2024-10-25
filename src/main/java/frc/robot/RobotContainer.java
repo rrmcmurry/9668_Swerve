@@ -81,6 +81,8 @@ public class RobotContainer {
         .onTrue(new RunCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
+    
+    
 
     // Pressing Xbox contoller's X button toggles fieldRelativeDrive and zeros the gyroscope's heading
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
@@ -115,9 +117,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(-.5)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(new Translation2d(0.5, 0.5), new Translation2d(1, -0.5)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
+        new Pose2d(2, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(
