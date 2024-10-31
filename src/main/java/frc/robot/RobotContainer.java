@@ -81,7 +81,7 @@ public class RobotContainer {
     visiontable = NetworkTableInstance.getDefault().getTable("Vision");
     visionsubx = visiontable.getDoubleTopic("X_Axis").subscribe(0.00);
     visionsuby = visiontable.getDoubleTopic("Y_Axis").subscribe(0.00);
-    visionsubz = visiontable.getDoubleTopic("Z_Axis").subscribe(0.00);
+    visionsubz = visiontable.getDoubleTopic("Z-Axis").subscribe(0.00);
   }
 
   /**
@@ -130,9 +130,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(-.5)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(0.5, 0.5), new Translation2d(1, -0.5)),
+        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(2, 0, new Rotation2d(0)),
+        new Pose2d(3, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(
@@ -157,4 +157,14 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
   }
+
+  public Command getRaspberryPiCommands() {
+
+    double x = visionsubx.get();
+    double y = visionsuby.get();
+    double z = visionsubz.get();
+
+    return new RunCommand( () ->m_robotDrive.drive(x,y,z, false, false) );
+  }
+
 }
