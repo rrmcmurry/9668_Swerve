@@ -81,7 +81,7 @@ public class RobotContainer {
     visiontable = NetworkTableInstance.getDefault().getTable("Vision");
     visionsubx = visiontable.getDoubleTopic("X_Axis").subscribe(0.00);
     visionsuby = visiontable.getDoubleTopic("Y_Axis").subscribe(0.00);
-    visionsubz = visiontable.getDoubleTopic("Z-Axis").subscribe(0.00);
+    visionsubz = visiontable.getDoubleTopic("Z_Axis").subscribe(0.00);
   }
 
   /**
