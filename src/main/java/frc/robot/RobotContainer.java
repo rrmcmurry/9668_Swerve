@@ -157,14 +157,4 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
   }
-
-  public Command getRaspberryPiCommands() {
-
-    double x = visionsubx.get();
-    double y = visionsuby.get();
-    double z = visionsubz.get();
-
-    return new RunCommand( () ->m_robotDrive.drive(x,y,z, false, false) );
-  }
-
 }
