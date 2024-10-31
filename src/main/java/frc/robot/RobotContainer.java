@@ -23,6 +23,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+// Import NetworkTables
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.DoubleSubscriber;
+
+
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -41,6 +47,15 @@ public class RobotContainer {
 
   // Initially using rate limits
   private boolean m_rateLimit = true;
+
+  NetworkTable visiontable;
+  DoubleSubscriber visionsubx;
+  DoubleSubscriber visionsuby;
+  DoubleSubscriber visionsubz;
+  Double X_Axis;
+  Double Y_Axis;
+  Double Z_Axis;
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -61,6 +76,12 @@ public class RobotContainer {
                 m_fieldRelativeDrive, m_rateLimit),
             m_robotDrive)
       );
+
+    // Subscribe to Network Table Vision and get X and Y value subscriptions
+    visiontable = NetworkTableInstance.getDefault().getTable("Vision");
+    visionsubx = visiontable.getDoubleTopic("X_Axis").subscribe(0.00);
+    visionsuby = visiontable.getDoubleTopic("Y_Axis").subscribe(0.00);
+    visionsubz = visiontable.getDoubleTopic("Z-Axis").subscribe(0.00);
   }
 
   /**
@@ -72,28 +93,22 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // While pressing Xbox controller's right bumper (kR1), set the wheels in an X formation to prevent movement
     new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+        .whileTrue(new RunCommand( () -> m_robotDrive.setX(), m_robotDrive));
 
     // Pressing Xbox contoller's Y button resets the gyroscope's heading
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
-        .onTrue(new RunCommand(
-            () -> m_robotDrive.zeroHeading(),
-            m_robotDrive));
+        .toggleOnTrue(new RunCommand( () -> m_robotDrive.zeroHeading(), m_robotDrive));
 
     // Pressing Xbox contoller's X button toggles fieldRelativeDrive and zeros the gyroscope's heading
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
-        .onTrue(new RunCommand( 
-            () -> {
+        .toggleOnTrue(new RunCommand( () -> { 
               m_fieldRelativeDrive =!m_fieldRelativeDrive;
               if (m_fieldRelativeDrive) {m_robotDrive.zeroHeading();}
             }, m_robotDrive));
 
     // Pressing Xbox contoller's start button toggles the use of rateLimit
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
-        .onTrue(new RunCommand( 
-            () -> m_rateLimit =!m_rateLimit));
+        .toggleOnTrue(new RunCommand( () -> m_rateLimit =!m_rateLimit));
 
 }
 
@@ -142,4 +157,14 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
   }
+
+  public Command getRaspberryPiCommands() {
+
+    double x = visionsubx.get();
+    double y = visionsuby.get();
+    double z = visionsubz.get();
+
+    return new RunCommand( () ->m_robotDrive.drive(x,y,z, false, false) );
+  }
+
 }
