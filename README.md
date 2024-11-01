@@ -1,8 +1,7 @@
 # 9668_Swerve 
 
-Malfunctionz - West High School Robotics club
-
-### West High School, Knoxville, TN
+### Malfunctionz - West High School Robotics club
+#### West High School, Knoxville, TN
 
 ## Description
 
@@ -10,7 +9,7 @@ This is an ongoing project under development during the off season.  We have two
 
 This project is based on a template project for an FRC swerve drive train that uses REV MAXSwerve Modules. See [REVrobotics MAXSwerve Java Template](https://github.com/REVrobotics/MAXSwerve-Java-Template/) for more information.
 
-Current objectives:
+## Current objectives:
 - Learn how to detect AprilTags with a parrallel processor - DONE
 - Get Swerve Drive to work with an XBox controller - DONE
 - Get field oriented remote control driving to work - DONE
