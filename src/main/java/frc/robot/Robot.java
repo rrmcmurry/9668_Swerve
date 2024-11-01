@@ -4,24 +4,51 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.DriveSubsystem;
+
+
 
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
+
+  // Drive command variables
+  Double x;
+  Double y;
+  Double z;
+  boolean fieldRelative;
+  boolean rateLimit;
+
+  // The robot's subsystems
+  private final DriveSubsystem swerveDrive = new DriveSubsystem();
+
+  // The driver's controller
+  private final XboxController controller = new XboxController(OIConstants.kDriverControllerPort);
+  
+  // Network Tables
+  NetworkTable visiontable;
+  DoubleSubscriber visionsubx;
+  DoubleSubscriber visionsuby;
+  DoubleSubscriber visionsubz;
+
 
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer();
+    // Subscribe to Network Table Vision 
+    visiontable = NetworkTableInstance.getDefault().getTable("Vision");
+    visionsubx = visiontable.getDoubleTopic("X_Axis").subscribe(0.00);
+    visionsuby = visiontable.getDoubleTopic("Y_Axis").subscribe(0.00);
+    visionsubz = visiontable.getDoubleTopic("Z-Axis").subscribe(0.00);
   }
 
   @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
+  public void robotPeriodic() {}
 
   @Override
   public void disabledInit() {}
@@ -30,33 +57,61 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void autonomousInit() {
-    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.schedule();
-    // }
-  }
+  public void autonomousInit() {}
 
   @Override
   public void autonomousPeriodic() {
-    m_autonomousCommand = m_robotContainer.getRaspberryPiCommands();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-    
+    // Get control values from network tables
+    x = MathUtil.applyDeadband(visionsubx.get(), OIConstants.kDriveDeadband);
+    y = MathUtil.applyDeadband(visionsuby.get(), OIConstants.kDriveDeadband);
+    z = MathUtil.applyDeadband(visionsubz.get(), OIConstants.kDriveDeadband);
+
+    // Send controls to swerve drive
+    swerveDrive.drive(y,x,z, false, true);
+
   }
 
   @Override
   public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+    // Initially using field relative with rate limits
+    fieldRelative = true;
+    rateLimit = true;
+
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    
+    // Right bumper - sets wheels in an X formation
+    if (controller.getRightBumperPressed() ) {
+      swerveDrive.setX();
+    }
+
+    // Y button - Resets gyroscope heading
+    if (controller.getYButtonPressed() ) {
+      swerveDrive.zeroHeading();
+    }
+    
+    // X button - Toggles field relative
+    if (controller.getXButtonPressed()) {
+      fieldRelative = !fieldRelative;      
+    }
+    
+    // Start button - Toggles the use of rate limits
+    if (controller.getStartButtonPressed()) {
+      rateLimit = !rateLimit;
+    }
+
+    // Get control values from the controller
+    x = -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
+    y = -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband);
+    z = -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
+
+    // Send controls to swerve drive
+    swerveDrive.drive(y,x,z, fieldRelative, rateLimit);
+
+  }
 
   @Override
   public void testInit() {}

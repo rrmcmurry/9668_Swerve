@@ -131,6 +131,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 
     SmartDashboard.putNumber("Gyro: ", -m_gyro.getAngle());
+    SmartDashboard.putNumber("Odometry-X: ", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("Odometry-Y: ", m_odometry.getPoseMeters().getY());
 
     if (rateLimit) {
       // Convert XY to polar for rate limiting
@@ -189,8 +191,10 @@ public class DriveSubsystem extends SubsystemBase {
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
