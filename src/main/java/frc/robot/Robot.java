@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Initially using field relative with rate limits
     fieldRelative = true;
-    rateLimit = true;
+    rateLimit = false;
 
   }
 
