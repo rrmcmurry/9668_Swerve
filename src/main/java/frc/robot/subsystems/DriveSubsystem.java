@@ -12,13 +12,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.kauailabs.navx.frc.AHRS;
+
+
 
 
 
@@ -56,7 +61,10 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  
+  // NetworkTable Entries for Position
+  private NetworkTableEntry PoseX;
+  private NetworkTableEntry PoseY;
+  private NetworkTableEntry PoseZ;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -69,10 +77,15 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
+  private Pose2d currentPose = new Pose2d();
       
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-  
+    // Initialize NetworkTable variables
+    NetworkTable PoseTable = NetworkTableInstance.getDefault().getTable("Pose");
+    PoseX = PoseTable.getEntry("X");
+    PoseY = PoseTable.getEntry("Y");
+    PoseZ = PoseTable.getEntry("Z");
   }
 
   @Override
@@ -86,6 +99,14 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+    
+    // Get the current pose
+    currentPose = m_odometry.getPoseMeters();
+
+    // Publish x, y, position and current heading to NetworkTables
+    PoseX.setDouble(Units.metersToFeet(currentPose.getX()));
+    PoseY.setDouble(Units.metersToFeet(currentPose.getY()));
+    PoseZ.setDouble(currentPose.getRotation().getDegrees());
   }
 
   /**
@@ -128,11 +149,6 @@ public class DriveSubsystem extends SubsystemBase {
     
     double xSpeedCommanded;
     double ySpeedCommanded;
-
-
-    SmartDashboard.putNumber("Gyro: ", -m_gyro.getAngle());
-    SmartDashboard.putNumber("Odometry-X: ", m_odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("Odometry-Y: ", m_odometry.getPoseMeters().getY());
 
     if (rateLimit) {
       // Convert XY to polar for rate limiting
