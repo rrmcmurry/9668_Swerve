@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -48,7 +49,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    swerveDrive.periodic();
+  }
 
   @Override
   public void disabledInit() {}
@@ -91,6 +94,12 @@ public class Robot extends TimedRobot {
     // Y button - Resets gyroscope heading
     if (controller.getYButtonPressed() ) {
       swerveDrive.zeroHeading();
+    }
+    
+    // B button - Resets gyroscope heading
+    if (controller.getBButtonPressed() ) {
+      Pose2d newpose = new Pose2d();
+      swerveDrive.resetOdometry(newpose);
     }
     
     // X button - Toggles field relative

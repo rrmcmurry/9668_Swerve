@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -103,9 +102,20 @@ public class DriveSubsystem extends SubsystemBase {
     // Get the current pose
     currentPose = m_odometry.getPoseMeters();
 
+    
+    double x = currentPose.getX();
+    x = x * 100;
+    x = Math.round(x);
+    x = x / 100;
+
+    double y = currentPose.getY();
+    y = y * 100;
+    y = Math.round(y);
+    y = y / 100;
+
     // Publish x, y, position and current heading to NetworkTables
-    PoseX.setDouble(Units.metersToFeet(currentPose.getX()));
-    PoseY.setDouble(Units.metersToFeet(currentPose.getY()));
+    PoseX.setDouble(-y);
+    PoseY.setDouble(x);
     PoseZ.setDouble(currentPose.getRotation().getDegrees());
   }
 
