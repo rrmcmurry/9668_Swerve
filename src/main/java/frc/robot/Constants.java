@@ -33,7 +33,7 @@ public final class Constants {
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
-
+    
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
@@ -62,6 +62,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 9;
     public static final int kRearRightTurningCanId = 5;
     
+    public static final double kUnitstoFeet = 4.59318;
   }
 
   public static final class ModuleConstants {

@@ -102,20 +102,20 @@ public class DriveSubsystem extends SubsystemBase {
     // Get the current pose
     currentPose = m_odometry.getPoseMeters();
 
-    
-    double x = currentPose.getX();
-    x = x * 100;
-    x = Math.round(x);
-    x = x / 100;
+    // Convert X and Y values to feet and round 
+    // positive X value represents distance traveled forward
+    double forward = currentPose.getX();  
+    forward = forward * DriveConstants.kUnitstoFeet; // Convert to feet
+    forward = Math.round(forward * 100) / 100D; // Round
 
-    double y = currentPose.getY();
-    y = y * 100;
-    y = Math.round(y);
-    y = y / 100;
+    // positive Y value represents distance traveled to the left  
+    double side = -currentPose.getY();  // Make left negative
+    side = side * DriveConstants.kUnitstoFeet; // Convert to feet
+    side = Math.round(side * 100) / 100D; // Round
 
-    // Publish x, y, position and current heading to NetworkTables
-    PoseX.setDouble(-y);
-    PoseY.setDouble(x);
+    // Publish position and current heading to NetworkTables
+    PoseX.setDouble(side);
+    PoseY.setDouble(forward);
     PoseZ.setDouble(currentPose.getRotation().getDegrees());
   }
 
