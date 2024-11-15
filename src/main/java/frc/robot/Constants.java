@@ -62,7 +62,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 9;
     public static final int kRearRightTurningCanId = 5;
     
-    public static final double kUnitstoFeet = 4.59318;
+    public static final double kUnitstoFeet = 4.2;
   }
 
   public static final class ModuleConstants {
