@@ -13,13 +13,13 @@ This project is based on a template project for an FRC swerve drive train that u
 - Learn how to detect AprilTags with a [parrallel processor](https://github.com/rrmcmurry/WestPi/) - DONE
 - Get Swerve Drive to work with an XBox controller - DONE
 - Get field oriented remote control driving to work - DONE
-- Use the parrallel processor to control to the Swerve Drive in Autonomous mode - In Progress
-    - Have the robot turn towards an AprilTag
-    - Have the robot follow an AprilTag around like a puppy
-    - Have the robot find a specific pose based on the pose of an AprilTag
-- Find a method of tracking position
-- Pass position information from Robot to Raspberry Pi
-- Use flow fields with position info in the raspberry pi to drive to specific locations and orientations 
+- Use the parrallel processor to control to the Swerve Drive in Autonomous mode - DONE
+    - Have the robot turn towards an AprilTag - DONE
+    - Have the robot follow an AprilTag around like a puppy - DONE
+    - Have the robot find a specific pose based on the pose of an AprilTag - DONE
+- Find a method of tracking position - DONE
+- Pass position information from Robot to Raspberry Pi - In Progress
+- Use flow fields with position info in the raspberry pi to drive to specific locations and orientations - In Progress
 - Use AprilTags in known positions to error correct position information.
 - Put lots of AprilTags in a game field in known positions and use flow fields to change objectives\
 - Modify the flowfields based on detection of other robots and/or obstacles
