@@ -20,9 +20,9 @@ import frc.robot.subsystems.DriveSubsystem;
 public class Robot extends TimedRobot {
 
   // Drive command variables
-  Double x;
-  Double y;
-  Double z;
+  Double strafe;
+  Double forward;
+  Double rotate;
   boolean fieldRelative;
   boolean rateLimit;
 
@@ -33,19 +33,19 @@ public class Robot extends TimedRobot {
   private final XboxController controller = new XboxController(OIConstants.kDriverControllerPort);
   
   // Network Tables
-  NetworkTable visiontable;
-  DoubleSubscriber visionsubx;
-  DoubleSubscriber visionsuby;
-  DoubleSubscriber visionsubz;
+  NetworkTable NetworkController;
+  DoubleSubscriber networkcontroller_leftJoyX;
+  DoubleSubscriber networkcontroller_leftJoyY;
+  DoubleSubscriber networkcontroller_rightJoyX;
 
 
   @Override
   public void robotInit() {
     // Subscribe to Network Table Vision 
-    visiontable = NetworkTableInstance.getDefault().getTable("Vision");
-    visionsubx = visiontable.getDoubleTopic("X_Axis").subscribe(0.00);
-    visionsuby = visiontable.getDoubleTopic("Y_Axis").subscribe(0.00);
-    visionsubz = visiontable.getDoubleTopic("Z-Axis").subscribe(0.00);
+    NetworkController = NetworkTableInstance.getDefault().getTable("NetworkController");
+    networkcontroller_leftJoyX = NetworkController.getDoubleTopic("leftJoyX").subscribe(0.00);
+    networkcontroller_leftJoyY = NetworkController.getDoubleTopic("leftJoyY").subscribe(0.00);
+    networkcontroller_rightJoyX = NetworkController.getDoubleTopic("rightJoyX").subscribe(0.00);
   }
 
   @Override
@@ -60,18 +60,22 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {  
+    // Initially using field relative with rate limits
+    fieldRelative = true;
+    rateLimit = false;
+  }
 
   @Override
   public void autonomousPeriodic() {
 
     // Get control values from network tables
-    x = MathUtil.applyDeadband(visionsubx.get(), OIConstants.kDriveDeadband);
-    y = MathUtil.applyDeadband(visionsuby.get(), OIConstants.kDriveDeadband);
-    z = MathUtil.applyDeadband(visionsubz.get(), OIConstants.kDriveDeadband);
+    strafe = MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
+    forward = MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
+    rotate = MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
 
-    // Send controls to swerve drive
-    swerveDrive.drive(y,x,z, false, true);
+    // Send control values to swerve drive
+    swerveDrive.drive(forward,strafe,rotate, fieldRelative, rateLimit);
 
   }
 
@@ -96,7 +100,7 @@ public class Robot extends TimedRobot {
       swerveDrive.zeroHeading();
     }
     
-    // B button - Resets gyroscope heading
+    // B button - Resets pose
     if (controller.getBButtonPressed() ) {
       Pose2d newpose = new Pose2d();
       swerveDrive.resetOdometry(newpose);
@@ -113,12 +117,12 @@ public class Robot extends TimedRobot {
     }
 
     // Get control values from the controller
-    x = -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
-    y = -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband);
-    z = -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
+    strafe = -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
+    forward = -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband);
+    rotate = -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
 
-    // Send controls to swerve drive
-    swerveDrive.drive(y,x,z, fieldRelative, rateLimit);
+    // Send control values to swerve drive
+    swerveDrive.drive(forward,strafe,rotate, fieldRelative, rateLimit);
 
   }
 
