@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
   Double rotate;
   boolean fieldRelative;
   boolean rateLimit;
+  boolean teleautonomous;
 
   // The robot's subsystems
   private final DriveSubsystem swerveDrive = new DriveSubsystem();
@@ -70,7 +71,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     // Get control values from network tables
-    strafe = MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
+    strafe = -MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
     forward = MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
     rotate = MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
 
@@ -84,6 +85,7 @@ public class Robot extends TimedRobot {
     // Initially using field relative with rate limits
     fieldRelative = true;
     rateLimit = false;
+    teleautonomous = false;
 
   }
 
@@ -113,13 +115,22 @@ public class Robot extends TimedRobot {
     
     // Start button - Toggles the use of rate limits
     if (controller.getStartButtonPressed()) {
-      rateLimit = !rateLimit;
+      // rateLimit = !rateLimit;
+      teleautonomous = !teleautonomous;
     }
 
     // Get control values from the controller
     strafe = -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
     forward = -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband);
     rotate = -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
+
+    if (teleautonomous) {
+    // Get control values from network tables
+    strafe = -MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
+    forward = MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
+    rotate = MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
+    }
+    
 
     // Send control values to swerve drive
     swerveDrive.drive(forward,strafe,rotate, fieldRelative, rateLimit);
