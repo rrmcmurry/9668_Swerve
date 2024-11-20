@@ -41,10 +41,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // Subscribe to Network Table NetworkController on Raspberry Pi Server 
-    NetworkTableInstance.getDefault().stopLocal();
-    NetworkTableInstance.getDefault().setServer("wpilibpi.local");
-    NetworkTableInstance.getDefault().startClient4("9668_Swerve");
+    NetworkTableInstance.getDefault().startServer();
     NetworkController = NetworkTableInstance.getDefault().getTable("NetworkController");
     networkcontroller_leftJoyX = NetworkController.getDoubleTopic("leftJoyX").subscribe(0.00);
     networkcontroller_leftJoyY = NetworkController.getDoubleTopic("leftJoyY").subscribe(0.00);
