@@ -114,8 +114,8 @@ public class DriveSubsystem extends SubsystemBase {
     side = Math.round(side * 100) / 100D; // Round
 
     // Publish position and current heading to NetworkTables
-    PoseX.setDouble(side);
-    PoseY.setDouble(forward);
+    PoseX.setDouble(forward);
+    PoseY.setDouble(side);
     PoseZ.setDouble(currentPose.getRotation().getDegrees());
   }
 
