@@ -159,7 +159,7 @@ public class DriveSubsystem extends SubsystemBase {
     double forwardCommanded;
     double strafeCommanded;
 
-    // Make strafe and rotation left a positive value for swerve drive kinematics
+    // Make strafe and rotation left a positive value as expected for swerve drive kinematics
     strafe = -strafe; 
     rotation = -rotation;
 
