@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -92,24 +91,19 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     
-    // Right bumper - sets wheels in an X formation
-    if (controller.getRightBumperPressed() ) {
+    // X button - sets wheels in an X formation
+    if (controller.getXButtonPressed() ) {
       swerveDrive.setX();
     }
 
-    // Y button - Resets gyroscope heading
+    // Y button - Resets heading and sets pose to 0,5
     if (controller.getYButtonPressed() ) {
-      swerveDrive.zeroHeading();
+      swerveDrive.zeroHeading();      
+      swerveDrive.setPose(0,5,0);
     }
     
-    // B button - Resets pose
-    if (controller.getBButtonPressed() ) {
-      Pose2d newpose = new Pose2d();
-      swerveDrive.resetOdometry(newpose);
-    }
-    
-    // X button - Toggles field relative
-    if (controller.getXButtonPressed()) {
+    // Back button - Toggles field relative    
+    if (controller.getBackButtonPressed()) {
       fieldRelative = !fieldRelative;      
     }
     

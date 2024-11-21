@@ -145,6 +145,19 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
+
+  /**
+  * Sets the robot's pose based on the given x, y, and z (yaw/rotation) values.
+  *
+  * @param x The x-coordinate (in meters).
+  * @param y The y-coordinate (in meters).
+  * @param z The rotation in degrees.
+  */
+  public void setPose(double x, double y, double z) {
+    Pose2d newPose = new Pose2d(x, y, Rotation2d.fromDegrees(z));
+    resetOdometry(newPose);
+  }
+
    /**
    * Method to drive the robot using joystick info.
    *
