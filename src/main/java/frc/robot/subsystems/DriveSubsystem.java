@@ -154,6 +154,10 @@ public class DriveSubsystem extends SubsystemBase {
   * @param z The rotation in degrees.
   */
   public void setPose(double x, double y, double z) {
+    // Convert X and Y values from feet back to natural units
+    x = x / DriveConstants.kUnitstoFeet;
+    y = -y / DriveConstants.kUnitstoFeet;
+
     Pose2d newPose = new Pose2d(x, y, Rotation2d.fromDegrees(z));
     resetOdometry(newPose);
   }

@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
     networkcontroller_leftJoyX = NetworkController.getDoubleTopic("leftJoyX").subscribe(0.00);
     networkcontroller_leftJoyY = NetworkController.getDoubleTopic("leftJoyY").subscribe(0.00);
     networkcontroller_rightJoyX = NetworkController.getDoubleTopic("rightJoyX").subscribe(0.00);
+    swerveDrive.setPose(0,5,0);
   }
 
   @Override
@@ -83,7 +84,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     // Initially using field relative with rate limits
     fieldRelative = true;
-    rateLimit = false;
+    rateLimit = true;
     teleautonomous = false;
 
   }
