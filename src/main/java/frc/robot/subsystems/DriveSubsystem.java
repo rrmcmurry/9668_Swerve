@@ -148,22 +148,25 @@ public class DriveSubsystem extends SubsystemBase {
    /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed        Speed of the robot in the x direction (forward).
-   * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the
-   *                      field.
+   * @param forward       Speed of the robot in the forward, forward positive.
+   * @param strafe        Speed of the robot in the sideways direction, left negative.
+   * @param rotation      Rate of the robot rotation, left negative.
+   * @param fieldRelative Whether the provided speeds are relative to the field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
+  public void drive(double forward, double strafe, double rotation, boolean fieldRelative, boolean rateLimit) {
     
-    double xSpeedCommanded;
-    double ySpeedCommanded;
+    double forwardCommanded;
+    double strafeCommanded;
+
+    // Make strafe and rotation left a positive value for swerve drive kinematics
+    strafe = -strafe; 
+    rotation = -rotation;
 
     if (rateLimit) {
       // Convert XY to polar for rate limiting
-      double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+      double inputTranslationDir = Math.atan2(strafe, forward);
+      double inputTranslationMag = Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2));
 
       // Calculate the direction slew rate based on an estimate of the lateral acceleration
       double directionSlewRate;
@@ -197,26 +200,26 @@ public class DriveSubsystem extends SubsystemBase {
       }
       m_prevTime = currentTime;
       
-      xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
-      ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
-      m_currentRotation = m_rotLimiter.calculate(rot);
+      forwardCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
+      strafeCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
+      m_currentRotation = m_rotLimiter.calculate(rotation);
 
 
     } else {
-      xSpeedCommanded = xSpeed;
-      ySpeedCommanded = ySpeed;
-      m_currentRotation = rot;
+      forwardCommanded = forward;
+      strafeCommanded = strafe;
+      m_currentRotation = rotation;
     }
 
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double forwardDelivered = forwardCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double strafeDelivered = strafeCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle()))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(forwardDelivered, strafeDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle()))
+            : new ChassisSpeeds(forwardDelivered, strafeDelivered, rotDelivered));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);

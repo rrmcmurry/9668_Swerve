@@ -71,12 +71,12 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
 
     // Get control values from network tables
-    strafe = -MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
+    strafe = MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
     forward = MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
     rotate = MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
 
     // Send control values to swerve drive
-    swerveDrive.drive(forward,strafe,rotate, fieldRelative, rateLimit);
+    swerveDrive.drive(forward, strafe, rotate, fieldRelative, rateLimit);
 
   }
 
@@ -113,27 +113,26 @@ public class Robot extends TimedRobot {
       fieldRelative = !fieldRelative;      
     }
     
-    // Start button - Toggles the use of rate limits
-    if (controller.getStartButtonPressed()) {
-      // rateLimit = !rateLimit;
+    // Start button - Toggles autonomous mode
+    if (controller.getStartButtonPressed()) {      
       teleautonomous = !teleautonomous;
     }
 
     // Get control values from the controller
-    strafe = -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
-    forward = -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband);
-    rotate = -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
+    strafe = MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
+    forward = MathUtil.applyDeadband(controller.getLeftY() * -1.0, OIConstants.kDriveDeadband);
+    rotate = MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
 
     if (teleautonomous) {
-    // Get control values from network tables
-    strafe = -MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
-    forward = MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
-    rotate = MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
+      // Combine with controller values from network tables
+      strafe = strafe + MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
+      forward = forward + MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
+      rotate = rotate + MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
     }
     
 
-    // Send control values to swerve drive
-    swerveDrive.drive(forward,strafe,rotate, fieldRelative, rateLimit);
+    // Send controller values to swerve drive
+    swerveDrive.drive(forward, strafe, rotate, fieldRelative, rateLimit);
 
   }
 
