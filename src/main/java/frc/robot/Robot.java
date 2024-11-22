@@ -120,9 +120,9 @@ public class Robot extends TimedRobot {
 
     if (teleautonomous) {
       // Combine with controller values from network tables
-      strafe = strafe + MathUtil.applyDeadband(networkcontroller_leftJoyX.get(), OIConstants.kDriveDeadband);
-      forward = forward + MathUtil.applyDeadband(networkcontroller_leftJoyY.get(), OIConstants.kDriveDeadband);
-      rotate = rotate + MathUtil.applyDeadband(networkcontroller_rightJoyX.get(), OIConstants.kDriveDeadband);
+      strafe = strafe + networkcontroller_leftJoyX.get();
+      forward = forward + networkcontroller_leftJoyY.get();
+      rotate = rotate + networkcontroller_rightJoyX.get();
     }
     
 
