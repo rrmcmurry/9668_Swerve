@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,6 +26,7 @@ public class Robot extends TimedRobot {
   boolean fieldRelative;
   boolean rateLimit;
   boolean teleautonomous;
+  boolean humandriver;
 
   // The robot's subsystems
   private final DriveSubsystem swerveDrive = new DriveSubsystem();
@@ -37,6 +39,9 @@ public class Robot extends TimedRobot {
   DoubleSubscriber networkcontroller_leftJoyX;
   DoubleSubscriber networkcontroller_leftJoyY;
   DoubleSubscriber networkcontroller_rightJoyX;
+  NetworkTable GameManager;
+  NetworkTableEntry nthumandriver;
+  
 
 
   @Override
@@ -47,6 +52,8 @@ public class Robot extends TimedRobot {
     networkcontroller_leftJoyY = NetworkController.getDoubleTopic("leftJoyY").subscribe(0.00);
     networkcontroller_rightJoyX = NetworkController.getDoubleTopic("rightJoyX").subscribe(0.00);
     swerveDrive.setPose(0,5,0);
+    GameManager = NetworkTableInstance.getDefault().getTable("GameManager");
+    nthumandriver = GameManager.getEntry("HumanDriver");
   }
 
   @Override
@@ -64,7 +71,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {  
     // Initially using field relative with rate limits
     fieldRelative = true;
-    rateLimit = false;
+    rateLimit = false;    
+    nthumandriver.setBoolean(false);
   }
 
   @Override
@@ -86,7 +94,7 @@ public class Robot extends TimedRobot {
     fieldRelative = true;
     rateLimit = true;
     teleautonomous = false;
-
+    nthumandriver.setBoolean(true);    
   }
 
   @Override
@@ -113,16 +121,21 @@ public class Robot extends TimedRobot {
       teleautonomous = !teleautonomous;
     }
 
-    // Get control values from the controller
-    strafe = MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband);
-    forward = MathUtil.applyDeadband(controller.getLeftY() * -1.0, OIConstants.kDriveDeadband);
-    rotate = MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband);
+    // Get control values from the controller and apply speed limit and deadband
+    strafe = MathUtil.applyDeadband(controller.getLeftX() * OIConstants.kDriverSpeedLimit, OIConstants.kDriveDeadband);
+    forward = MathUtil.applyDeadband(-controller.getLeftY() * OIConstants.kDriverSpeedLimit, OIConstants.kDriveDeadband);
+    rotate = MathUtil.applyDeadband(controller.getRightX() * OIConstants.kDriverRotationLimit, OIConstants.kDriveDeadband);
 
-    if (teleautonomous) {
-      // Combine with controller values from network tables
-      strafe = strafe + networkcontroller_leftJoyX.get();
-      forward = forward + networkcontroller_leftJoyY.get();
-      rotate = rotate + networkcontroller_rightJoyX.get();
+    // Evaluate whether a driver is driving and publish to networktables
+    humandriver = !(strafe == 0 && forward == 0 && rotate == 0);
+    nthumandriver.setBoolean(humandriver);
+
+    // If a human isn't currently driving and we're in teleautonomous mode
+    if (teleautonomous && !humandriver) {
+      // Use controller values from network tables 
+      strafe = networkcontroller_leftJoyX.get();
+      forward = networkcontroller_leftJoyY.get();
+      rotate = networkcontroller_rightJoyX.get();
     }
     
 
